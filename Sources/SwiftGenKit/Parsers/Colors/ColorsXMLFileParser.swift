@@ -38,7 +38,17 @@ extension Colors {
           throw ParserError.invalidFile(path: path, reason: "Invalid structure, color \(value) must have a name.")
         }
 
-        colors[name] = try Colors.parse(hex: value, key: name, path: path)
+        var rgba = value
+        if value.count == 10 {
+          let alphaStart = String.Index.init(utf16Offset: 2, in: value)
+          let alphaEnd = String.Index.init(utf16Offset: 3, in: value)
+          let alpha = value[alphaStart ... alphaEnd]
+          let rgbStart = String.Index.init(utf16Offset: 2, in: value)
+          let rgbEnd = String.Index.init(utf16Offset: 3, in: value)
+          let rgb = value[rgbStart ... rgbEnd]
+          rgba = "0x\(rgb)\(alpha)"
+        }
+        colors[name] = try Colors.parse(hex: rgba, key: name, path: path)
       }
 
       let name = path.lastComponentWithoutExtension
